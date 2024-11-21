@@ -3,29 +3,21 @@ import ErrorResponse from "../utils/errorResponse.js";
 import bcrypt from 'bcrypt';
 //load all users
 export const allUsers = async (req, res, next) => {
+    try {
+        // Fetch all users, excluding the password field
+        const users = await User.find().sort({ createdAt: -1 }).select('-password');
 
-    //enable pagination
-    const pageSize = 5;
-    const page = Number (req.query.pageNumber) || 1;
-    const count = await User.find({}).estimatedDocumentCount();
-
-    try{
-        const users = await User.find().sort({ createdAt: -1 }).select('-password')
-        .skip(pageSize * (page-1))
-    .limit(pageSize)
+        // Send the fetched users in the response
         res.status(200).json({
             success: true,
             users,
-            page,
-            pages: Math.ceil(count / pageSize),
-            count
-        })  
-        next();
+        });
+    } catch (error) {
+        // Log the error and pass it to the error-handling middleware
+        console.error('Error fetching users:', error);
+        next(error);
     }
-    catch (error) {
-        return next(error);
-    }
-}
+};
 
 //Show Single User
 export const singleUser = async (req, res, next) =>{
