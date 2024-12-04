@@ -529,44 +529,44 @@ export const getJDsByUser = async (req, res, next) => {
 
 
 // // Remove candidate from a locked JD and unlock the candidate
-// export const removeCandidateFromJD = async (req, res, next) => {
-//     try {
-//         const { jdId, candidateId } = req.body;
+export const removeCandidateFromJD = async (req, res, next) => {
+    try {
+        const { jdId, candidateId } = req.body;
 
-//         const jd = await JD.findById(jdId);
-//         if (!jd) {
-//             return next(new ErrorResponse('JD does not exist', 404));
-//         }
+        const jd = await JD.findById(jdId);
+        if (!jd) {
+            return next(new ErrorResponse('JD does not exist', 404));
+        }
 
-//         if (!jd.locked) {
-//             return next(new ErrorResponse('JD is not locked', 400));
-//         }
+        if (!jd.locked) {
+            return next(new ErrorResponse('JD is not locked', 400));
+        }
 
-//         const candidate = await Candidate.findById(candidateId);
-//         if (!candidate) {
-//             return next(new ErrorResponse('Candidate not found', 404));
-//         }
+        const candidate = await Candidate.findById(candidateId);
+        if (!candidate) {
+            return next(new ErrorResponse('Candidate not found', 404));
+        }
 
-//         if (!jd.candidates.includes(candidateId)) {
-//             return next(new ErrorResponse('Candidate is not assigned to this JD', 400));
-//         }
+        if (!jd.candidates.includes(candidateId)) {
+            return next(new ErrorResponse('Candidate is not assigned to this JD', 400));
+        }
 
-//         jd.candidates.pull(candidateId);
-//         await jd.save();
+        jd.candidates.pull(candidateId);
+        await jd.save();
 
-//         candidate.locked = false;
-//         await candidate.save();
+        candidate.locked = false;
+        await candidate.save();
 
-//         res.status(200).json({
-//             success: true,
-//             message: 'Candidate removed from JD and unlocked successfully',
-//             jd,
-//             candidate
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+        res.status(200).json({
+            success: true,
+            message: 'Candidate removed from JD and unlocked successfully',
+            jd,
+            candidate
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 
  

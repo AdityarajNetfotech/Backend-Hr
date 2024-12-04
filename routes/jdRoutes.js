@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCandidateToJD, createJD, deleteJD, editJD, getCandidatesFromJD, getJDsByUser, lockJD, ShowJDs, ShowLockedJDs, singleJD, unlockJD } from '../controllers/jdController.js'; 
+import { addCandidateToJD, createJD, deleteJD, editJD, getCandidatesFromJD, getJDsByUser, lockJD, ShowJDs, ShowLockedJDs, singleJD, unlockJD, removeCandidateFromJD } from '../controllers/jdController.js'; 
 import { isAuthenticated, isClient, isRecruiter, protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -40,6 +40,6 @@ router.get('/ShowUserJD',isAuthenticated, getJDsByUser);
 router.get('/jds/:jd_id/candidates', getCandidatesFromJD);
 
 //POST - /api/jd/remove-candidate
-// router.post('/jd/remove-candidate', removeCandidateFromJD);
+router.post('/jd/remove-candidate', removeCandidateFromJD);
 
 export default router;
