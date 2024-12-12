@@ -13,8 +13,7 @@ export const createJD = async (req, res, next) => {
             jd_status, locked, lockedBy, user, candidates
         } = req.body;
 
-        const userId = req.user._id;
- 
+        const userId = req?.user?._id;
         // Validate required fields based on jdSchema
         // if (!title || !client_name || !salary || !required_experience || !location ||
         //     !sign_up_rate || !payment_terms || !replacement_period || !no_of_openings ||
@@ -34,6 +33,7 @@ export const createJD = async (req, res, next) => {
             jd
         });
     } catch (error) {
+        console.log("check Error",error)
         next(error);
     }
 };
