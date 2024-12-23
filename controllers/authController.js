@@ -5,6 +5,8 @@ import nodemailer from 'nodemailer';
 import Mailgen from 'mailgen';
 import bcrypt from 'bcrypt'
 import express from 'express';
+import jwt from 'jsonwebtoken'
+
 const router = express.Router();
 
 
@@ -13,13 +15,13 @@ const router = express.Router();
 export const signup = async (req, res, next) => {
     try {
         const signupForm = req.body;
-        
+
         const { firstName, lastName, email, mobileNumber, joinAs, location, password } = signupForm;
 
         console.log(firstName, lastName, email, mobileNumber, joinAs, location, password);
-        
-        
-        const requiredFields = [ firstName, lastName, email, mobileNumber, joinAs, location, password ]
+
+
+        const requiredFields = [firstName, lastName, email, mobileNumber, joinAs, location, password]
 
         if (requiredFields.some(field => !field)) {
             return next(new ErrorResponse("Please enter all required fields", 400));
@@ -31,9 +33,9 @@ export const signup = async (req, res, next) => {
         }
 
 
-            console.log("I am here");
-            
-        
+        console.log("I am here");
+
+
         // Create a new user
         const user = await User.create({
             firstName: firstName,
@@ -46,7 +48,7 @@ export const signup = async (req, res, next) => {
         });
 
         console.log("User Created");
-        
+
 
         // Send OTP verification email
         await sendOTPVerificationEmail(user, res);
@@ -89,7 +91,7 @@ export const signin = async (req, res, next) => {
 
         sendTokenResponse(user, 200, res);
         console.log(user);
-        
+
 
     } catch (error) {
         next(error);
@@ -97,16 +99,15 @@ export const signin = async (req, res, next) => {
 }
 
 const sendTokenResponse = async (user, codeStatus, res) => {
-    const token = await user.getJwtToken();
-    console.log('Generated Token:', token); // Debug log for token creation
 
-    res.status(codeStatus)
-        .cookie('token', token, {
-            maxAge: 60 * 60 * 1000,
-            httpOnly: true,
-            sameSite: 'None', // Adjust as needed
-            secure: false, // Ensure false for development
-        })
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+    console.log('Generated Token:', token); 
+    const expiryDate = new Date(Date.now() + 3600000); 
+
+    res.cookie('token', token, {
+        httpOnly: true,
+        expires: expiryDate,
+    })
         .json({ success: true, userId: user._id, role: user.role });
 };
 
@@ -164,7 +165,7 @@ export const sendOTPVerificationEmail = async (user, res) => {
         const transporter = nodemailer.createTransport(config);
 
         // Generate OTP
-        const otp = Math.floor(1000 + Math.random() * 9000); 
+        const otp = Math.floor(1000 + Math.random() * 9000);
         const otpString = otp.toString();
         const mailOptions = {
             from: 'Aditya@netfotech.in',

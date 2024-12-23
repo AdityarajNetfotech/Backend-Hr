@@ -7,7 +7,7 @@ const router = express.Router();
 // JD ROUTES
 
 // POST /api/jd/create - to create a jd
-router.post('/jd/create', createJD);
+router.post('/jd/create', createJD, isAuthenticated);
 
 //GET /api/jd/:id - Get a single JD by ID
 router.get('/jd/:id', singleJD, isAuthenticated);
