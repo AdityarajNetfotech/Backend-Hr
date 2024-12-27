@@ -10,8 +10,26 @@ import jwt from 'jsonwebtoken'
 const router = express.Router();
 
 
+export const googleSignIn = async (req, res, next) => {
+    try {
+        const { email } = req.body;
 
-//user signup
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found. Please contact admin." });
+        }
+
+        sendTokenResponse(user, 200, res);
+        
+    } catch (error) {
+        console.error('Error in Google Login:', error);
+        res.status(500).json({ message: "Internal server error. Please try again later." });
+        next(error);
+    }
+};
+
+
+
 export const signup = async (req, res, next) => {
     try {
         const signupForm = req.body;
@@ -101,14 +119,17 @@ export const signin = async (req, res, next) => {
 const sendTokenResponse = async (user, codeStatus, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
-    console.log('Generated Token:', token); 
-    const expiryDate = new Date(Date.now() + 3600000); 
+    console.log('Generated Token:', token);
+    const expiryDate = new Date(Date.now() + 3600000);
 
     res.cookie('token', token, {
         httpOnly: true,
         expires: expiryDate,
-    })
-        .json({ success: true, userId: user._id, role: user.role });
+    }).json({
+        success: true,
+        userId: user._id,
+        role: user.role
+    });
 };
 
 

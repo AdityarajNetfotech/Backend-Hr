@@ -1,6 +1,6 @@
 import express from 'express';
 import User from '../models/userModel.js';
-import { getProfile, getUserProfile, logout, signin, signup, userProfile } from "../controllers/authController.js";
+import { getProfile, getUserProfile, googleSignIn, logout, signin, signup, userProfile } from "../controllers/authController.js";
 import { isAuthenticated, protect } from '../middleware/auth.js';
 import UserOTPVerification from '../models/UserOTPVerification.js'; // Import your model
 import bcrypt from 'bcrypt'; // Import bcrypt for OTP comparison
@@ -9,6 +9,8 @@ const router = express.Router();
 
 // User routes
 // POST /api/signup
+router.post("/google-signin", googleSignIn);
+
 router.post("/signup", signup);
 
 // POST /api/signin
