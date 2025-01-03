@@ -7,36 +7,32 @@ import ErrorResponse from '../utils/errorResponse.js';
 export const createJD = async (req, res, next) => {
     try {
         const {
-            job_title, company_Name, experience, industry,location,work_experience,salary, notice_period,
-            interview_rounds,job_type,priority_tag, delivery_deadline, replacement_period,
-            no_of_vacancy, absolute_payout, delivery_payout,sign_up_rate, skills_required, additional_comments,
+            job_title, company_Name, experience, industry, location, work_experience, salary, notice_period,
+            interview_rounds, job_type, priority_tag, delivery_deadline, replacement_period,
+            no_of_vacancy, absolute_payout, delivery_payout, sign_up_rate, skills_required, additional_comments,
             jd_status, locked, lockedBy, user, candidates
         } = req.body;
 
-        const userId = req?.user?._id;
-        // Validate required fields based on jdSchema
-        // if (!title || !client_name || !salary || !required_experience || !location ||
-        //     !sign_up_rate || !payment_terms || !replacement_period || !no_of_openings ||
-        //     !payout || !assured_time) {
-        //     return next(new ErrorResponse('Please provide all required fields', 400));
-        // }
- 
+        // Here, we extract the userId from the request body or from the session (depending on how you are storing it)
+        const userId = user || req?.user?._id; // Fallback to req.user._id if not sent explicitly
+
         const jd = await JD.create({
-            job_title, company_Name, experience, industry,location,work_experience,salary, notice_period,
-            interview_rounds,job_type,priority_tag, delivery_deadline, replacement_period,
-            no_of_vacancy, absolute_payout, delivery_payout,sign_up_rate, skills_required, additional_comments,
-            jd_status, locked, lockedBy, user:userId, candidates
+            job_title, company_Name, experience, industry, location, work_experience, salary, notice_period,
+            interview_rounds, job_type, priority_tag, delivery_deadline, replacement_period,
+            no_of_vacancy, absolute_payout, delivery_payout, sign_up_rate, skills_required, additional_comments,
+            jd_status, locked, lockedBy, user: userId, candidates
         });
- 
+
         res.status(201).json({
             success: true,
             jd
         });
     } catch (error) {
-        console.log("check Error",error)
+        console.error("Error:", error);
         next(error);
     }
 };
+
  
  
 // single JD find
@@ -253,8 +249,8 @@ export const getCandidatesFromJD = async (req, res, next) => {
 export const getJDsByUser = async (req, res, next) => {
     try {
         // Assuming `req.user._id` contains the logged-in user's ID
-        const userId = req.user._id;
-        console.log(userId);
+        const userId = req?.user?._id;
+        console.log("userID", userId);
         
 
         // Find JDs created by the logged-in user
