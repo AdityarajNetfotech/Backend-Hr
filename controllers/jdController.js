@@ -107,6 +107,8 @@ export const deleteJD = async (req, res, next) =>{
 export const lockJD = async (req, res, next) => {
     try {
       const { id } = req.params;
+      const { userId } = req.body;
+  
       const jd = await JD.findById(id);
   
       if (!jd) {
@@ -118,17 +120,18 @@ export const lockJD = async (req, res, next) => {
       }
   
       jd.locked = true;
-    //   jd.lockedBy = req.user.id;
+      jd.lockedBy = userId;
       await jd.save();
   
       res.status(200).json({
         success: true,
-        jd
+        jd,
       });
     } catch (error) {
       next(error);
     }
   };
+  
   
 
 // Show only locked JDs
@@ -271,6 +274,37 @@ export const getJDsByUser = async (req, res, next) => {
         next(error);
     }
 };
+
+// Get JDs created by the logged-in user
+export const getLockJDsByUser = async (req, res, next) => {
+    try {
+        const userId = req?.user?._id || req?.body?.userId || req?.query?.userId;
+
+        if (!userId) {
+            return next(new ErrorResponse("User ID is required", 400));
+        }
+
+        console.log("User ID:", userId);
+
+        // Find locked JDs associated with the user
+        const jds = await JD.find({ lockedBy: userId, locked: true });
+
+        // Check if the user has locked any JDs
+        if (!jds || jds.length === 0) {
+            return next(new ErrorResponse("No locked JDs found for this user", 404));
+        }
+
+        // Respond with the found JDs
+        res.status(200).json({
+            success: true,
+            count: jds.length,
+            jds,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 
 
@@ -525,6 +559,8 @@ export const getJDsByUser = async (req, res, next) => {
 
 
 // // Remove candidate from a locked JD and unlock the candidate
+
+
 export const removeCandidateFromJD = async (req, res, next) => {
     try {
         const { jdId, candidateId } = req.body;

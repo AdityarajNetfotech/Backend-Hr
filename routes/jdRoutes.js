@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCandidateToJD, createJD, deleteJD, editJD, getCandidatesFromJD, getJDsByUser, lockJD, ShowJDs, ShowLockedJDs, singleJD, unlockJD, removeCandidateFromJD } from '../controllers/jdController.js'; 
+import { addCandidateToJD, createJD, deleteJD, editJD, getCandidatesFromJD, getJDsByUser, lockJD, ShowJDs, ShowLockedJDs, singleJD, unlockJD, removeCandidateFromJD, getLockJDsByUser } from '../controllers/jdController.js';
 import { isAuthenticated, isClient, isRecruiter, protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -22,10 +22,10 @@ router.put('/jd/edit/:id', editJD);
 router.delete('/jd/delete/:id', deleteJD);
 
 //PUT - /api/lock/:jd_id
-router.put('/lock/:id',  lockJD);
+router.put('/lock/:id', lockJD);
 
 //GET - /api/locked-jds
-router.get('/locked-jds',  ShowLockedJDs);
+router.get('/locked-jds', ShowLockedJDs);
 
 //PUT - /api/jds/unlock/:id
 router.put('/unlock/:id', unlockJD, isAuthenticated, isRecruiter);
@@ -34,12 +34,15 @@ router.put('/unlock/:id', unlockJD, isAuthenticated, isRecruiter);
 router.post('/add-candidate', addCandidateToJD);
 
 //GET - /api/ShowUserJD
-router.get('/ShowUserJD',isAuthenticated, getJDsByUser);
+router.get('/ShowUserJD', isAuthenticated, getJDsByUser);
 
 //GET - /jds/:jd_id/candidates
 router.get('/jds/:jd_id/candidates', getCandidatesFromJD);
 
 //POST - /api/jd/remove-candidate
 router.post('/jd/remove-candidate', removeCandidateFromJD);
+
+router.get('/ShowUserLockJD', getLockJDsByUser);
+
 
 export default router;
